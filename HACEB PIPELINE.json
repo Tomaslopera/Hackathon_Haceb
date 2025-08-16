@@ -1,0 +1,911 @@
+{
+  "name": "HACEB PIPELINE",
+  "nodes": [
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.data || $json.text || $json.concatenated_data }}",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=file_id",
+                "value": "={{ $('Set File ID').first().json.file_id }}"
+              },
+              {
+                "name": "file_title",
+                "value": "={{ $('Set File ID').first().json.file_title }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "5f6f5950-ba6c-48c9-aa56-fcd0b67a9178",
+      "name": "Default Data Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-3-small",
+        "options": {}
+      },
+      "id": "1e102f80-95cc-4d47-af77-9bcf59a2ab8d",
+      "name": "Embeddings OpenAI1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        496
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "hVFfnvMIhcnSYacl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Add a Google Drive File to Vector DB",
+        "height": 867,
+        "width": 3281,
+        "color": 5
+      },
+      "id": "0629415a-8030-4d87-a28f-a1784649623d",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Set File ID').item.json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "id": "61f57163-f316-40e4-ac67-04802062fe1c",
+      "name": "Download File",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1024,
+        288
+      ],
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IBTy2ZKC6JKzfMJb",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1hOHX07hbBItc3v0Ujbn0QvqZB_sUaPt3",
+          "mode": "list",
+          "cachedResultName": "HACEB",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1hOHX07hbBItc3v0Ujbn0QvqZB_sUaPt3"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "id": "27f6165f-7abb-4316-9450-44de12a06d96",
+      "name": "File Created",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        96,
+        288
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IBTy2ZKC6JKzfMJb",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "8c77cace-8ab5-429e-a3a3-9852d1e5c866",
+      "name": "Extract PDF Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        64
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "id": "93efab2b-3f61-4da9-9d5b-2a4ee6dc6661",
+      "name": "Aggregate",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "chunkSize": 900,
+        "chunkOverlap": 120
+      },
+      "id": "e3502be8-e9ac-48cb-8af7-4d4624f66611",
+      "name": "Character Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        672
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "concatenate",
+              "field": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e22d1c1a-2d02-4dc3-9927-a43bd74b0349",
+      "name": "Summarize",
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1,
+      "position": [
+        2192,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.fileExtension || $json.extension || $json.name || $json.filename || '') }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "fa76862a-3084-489d-a015-7f8d3288e7da"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "6533b8d2-4c59-44ac-a34b-374e668599b4",
+                    "leftValue": "={{ $json.file_type || $json.mimeType || $json.contentType || $binary.data?.mimeType }}",
+                    "rightValue": "text/csv",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 1
+                },
+                "conditions": [
+                  {
+                    "id": "8f600e44-6cd8-489e-ac16-e9cf527b778d",
+                    "leftValue": "={{ $json.file_type || $json.mimeType || $json.contentType || $binary.data?.mimeType }}",
+                    "rightValue": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4cdd8ddb-3d41-42d1-951b-5964203d1c49",
+      "name": "Switch",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1264,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "id": "5456e6e4-5475-48e4-8662-081cebd295c1",
+      "name": "Insert into Supabase Vectorstore",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        288
+      ],
+      "credentials": {
+        "supabaseApi": {
+          "id": "1HYE5IEkmwcILav7",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "id": "ee14ccf1-19a1-4989-a4f5-c5bc550b1f8f",
+      "name": "Extract from Excel",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f422e2e0-381c-46ea-8f38-3f58c501d8b9",
+              "name": "schema",
+              "value": "={{ $('Extract from Excel').isExecuted ? $('Extract from Excel').first().json.keys().toJsonString() : $('Extract from CSV').first().json.keys().toJsonString() }}",
+              "type": "string"
+            },
+            {
+              "id": "bb07c71e-5b60-4795-864c-cc3845b6bc46",
+              "name": "data",
+              "value": "={{ $json.concatenated_data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2400,
+        96
+      ],
+      "id": "d62d4954-0724-48ef-af17-eed853688a84",
+      "name": "Set Schema"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        352
+      ],
+      "id": "70971a3e-40d6-4929-86eb-82f2fb0a3d6c",
+      "name": "Extract from CSV"
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "document_metadata",
+          "mode": "list",
+          "cachedResultName": "document_metadata"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Set File ID').item.json.file_id }}",
+            "title": "={{ $('Set File ID').item.json.file_title }}",
+            "url": "={{ $('Set File ID').item.json.file_url }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "schema",
+              "displayName": "schema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        720,
+        288
+      ],
+      "id": "705e1a1f-6371-4b09-a330-6765fda3f2c5",
+      "name": "Insert Document Metadata",
+      "executeOnce": true,
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "document_metadata",
+          "mode": "list",
+          "cachedResultName": "document_metadata"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Set File ID').item.json.file_id }}",
+            "schema": "={{ $json.schema }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "schema",
+              "displayName": "schema",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2656,
+        96
+      ],
+      "id": "ac7e36ec-d016-4e14-a20b-38bc4f964eda",
+      "name": "Update Schema for Document Metadata",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "10646eae-ae46-4327-a4dc-9987c2d76173",
+              "name": "file_id",
+              "value": "={{ $json.id ?? $json.fileId ?? $json.file?.id ?? $json.resource?.id }}",
+              "type": "string"
+            },
+            {
+              "id": "f4536df5-d0b1-4392-bf17-b8137fb31a44",
+              "name": "file_type",
+              "value": "={{ $json.name ?? $json.file?.name ?? $json.resource?.name ?? $json.filename }}",
+              "type": "string"
+            },
+            {
+              "id": "77d782de-169d-4a46-8a8e-a3831c04d90f",
+              "name": "file_title",
+              "value": "={{ $json.mimeType ?? $json.file?.mimeType ?? $json.resource?.mimeType }}",
+              "type": "string"
+            },
+            {
+              "id": "9bde4d7f-e4f3-4ebd-9338-dce1350f9eab",
+              "name": "file_url",
+              "value": "={{ (($json.name ?? $json.file?.name ?? $json.resource?.name) || '').split('.').pop().toLowerCase() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "be5d242d-2ce0-4c11-b880-4bbaef039819",
+      "name": "Set File ID",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "=={{ ($json.numero_pedido || $json.cedula || $json.estado_despacho) \n    ? 'ead' \n    : (($json.sku || $json.SKU || $json.producto) ? 'inventario' : 'otros') }}",
+                    "rightValue": "==ead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6f157c7b-2178-4592-9178-939cb8b76ea7"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "df494777-22f6-4158-8f57-1f8c895d2154",
+                    "leftValue": "=={{ ($json.numero_pedido || $json.cedula || $json.estado_despacho) \n    ? 'ead' \n    : (($json.sku || $json.SKU || $json.producto) ? 'inventario' : 'otros') }}",
+                    "rightValue": "==inventario",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1984,
+        560
+      ],
+      "id": "81d8d33f-9ab5-4bb7-ab19-5adf2284c13d",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH j AS (\n  SELECT $1::jsonb AS j\n),\nsrc AS (\n  SELECT\n    /* nº pedido: numero_pedido / pedido / order_id */\n    trim(COALESCE(NULLIF(j->>'numero_pedido',''), j->>'pedido', j->>'order_id')) AS numero_pedido,\n\n    /* nº transporte: limpia a dígitos; garantiza >= 1 */\n    GREATEST(\n      1,\n      COALESCE(NULLIF(regexp_replace(\n        COALESCE(NULLIF(j->>'numero_transporte',''), j->>'transporte', j->>'shipment_id', j->>'guia'),\n        '\\D', '', 'g'\n      ), '')::int, 0)\n    ) AS numero_transporte,\n\n    /* cédula: variantes cc/identificacion */\n    trim(COALESCE(NULLIF(j->>'cedula',''), j->>'cc', j->>'identificacion')) AS cedula,\n\n    /* estado: acepta estado_pedido / estado_despacho / estado / status */\n    trim(COALESCE(\n      NULLIF(j->>'estado_pedido',''),\n      NULLIF(j->>'estado_despacho',''),\n      NULLIF(j->>'estado',''),\n      j->>'status'\n    )) AS estado_pedido,\n\n    /* fechas: intenta castear si vienen; si no, NULL */\n    CASE\n      WHEN NULLIF(COALESCE(j->>'fecha_entrega', j->>'delivered_at'), '') IS NULL\n        THEN NULL\n      ELSE (COALESCE(j->>'fecha_entrega', j->>'delivered_at'))::timestamp\n    END AS fecha_entrega,\n\n    CASE\n      WHEN NULLIF(COALESCE(j->>'fecha_estimada_entrega', j->>'eta', j->>'fecha_estimada'), '') IS NULL\n        THEN NULL\n      ELSE (COALESCE(j->>'fecha_estimada_entrega', j->>'eta', j->>'fecha_estimada'))::timestamp\n    END AS fecha_estimada_entrega\n  FROM j\n)\nINSERT INTO ead (numero_pedido, numero_transporte, cedula, estado_pedido, fecha_entrega, fecha_estimada_entrega)\nSELECT numero_pedido, numero_transporte, cedula, estado_pedido, fecha_entrega, fecha_estimada_entrega\nFROM src\nON CONFLICT (numero_pedido) DO UPDATE SET\n  numero_transporte        = EXCLUDED.numero_transporte,\n  cedula                   = EXCLUDED.cedula,\n  estado_pedido            = EXCLUDED.estado_pedido,\n  fecha_entrega            = EXCLUDED.fecha_entrega,\n  fecha_estimada_entrega   = EXCLUDED.fecha_estimada_entrega;\n",
+        "options": {
+          "queryReplacement": "=={{ $json }}\n"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2336,
+        384
+      ],
+      "id": "e876a2c5-4a5b-4797-a512-5ab15856c567",
+      "name": "Insert Table EAD",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "WITH j AS (\n  SELECT $1::jsonb AS j\n),\nsrc AS (\n  SELECT\n    /* claves tolerantes: sku/SKU */\n    trim(COALESCE(NULLIF(j->>'sku',''), j->>'SKU'))                                  AS sku,\n    /* categoria/category */\n    trim(COALESCE(NULLIF(j->>'categoria',''), j->>'category'))                        AS categoria,\n    /* producto/product/nombre */\n    trim(COALESCE(NULLIF(j->>'producto',''), j->>'product', j->>'nombre'))            AS producto,\n\n    /* columnas de llegada (INT, 0 por defecto si viene vacío o con texto) */\n    COALESCE(NULLIF(regexp_replace(j->>'agosto16', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto16,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto17', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto17,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto18', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto18,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto19', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto19,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto20', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto20,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto21', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto21,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto22', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto22,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto23', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto23,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto24', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto24,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto25', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto25,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto26', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto26,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto27', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto27,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto28', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto28,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto29', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto29,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto30', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto30,\n    COALESCE(NULLIF(regexp_replace(j->>'agosto31', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS agosto31,\n\n    COALESCE(NULLIF(regexp_replace(j->>'stock_actual', '[^0-9\\.-]', '', 'g'), '')::int, 0) AS stock_actual\n  FROM j\n)\nINSERT INTO inventory\n  (sku, categoria, producto,\n   agosto16, agosto17, agosto18, agosto19, agosto20, agosto21, agosto22, agosto23,\n   agosto24, agosto25, agosto26, agosto27, agosto28, agosto29, agosto30, agosto31,\n   stock_actual)\nSELECT\n  sku, categoria, producto,\n  agosto16, agosto17, agosto18, agosto19, agosto20, agosto21, agosto22, agosto23,\n  agosto24, agosto25, agosto26, agosto27, agosto28, agosto29, agosto30, agosto31,\n  stock_actual\nFROM src\nON CONFLICT (sku) DO UPDATE SET\n  categoria   = EXCLUDED.categoria,\n  producto    = EXCLUDED.producto,\n  agosto16    = EXCLUDED.agosto16,\n  agosto17    = EXCLUDED.agosto17,\n  agosto18    = EXCLUDED.agosto18,\n  agosto19    = EXCLUDED.agosto19,\n  agosto20    = EXCLUDED.agosto20,\n  agosto21    = EXCLUDED.agosto21,\n  agosto22    = EXCLUDED.agosto22,\n  agosto23    = EXCLUDED.agosto23,\n  agosto24    = EXCLUDED.agosto24,\n  agosto25    = EXCLUDED.agosto25,\n  agosto26    = EXCLUDED.agosto26,\n  agosto27    = EXCLUDED.agosto27,\n  agosto28    = EXCLUDED.agosto28,\n  agosto29    = EXCLUDED.agosto29,\n  agosto30    = EXCLUDED.agosto30,\n  agosto31    = EXCLUDED.agosto31,\n  stock_actual= EXCLUDED.stock_actual;",
+        "options": {
+          "queryReplacement": "=={{ $json }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        2336,
+        576
+      ],
+      "id": "cd074cf8-bea0-458a-b92a-f873be9ffa33",
+      "name": "Insert Table Inventory",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Insert into Supabase Vectorstore",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Insert into Supabase Vectorstore",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download File": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Created": {
+      "main": [
+        [
+          {
+            "node": "Set File ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Text": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Set Schema",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Insert into Supabase Vectorstore",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from CSV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract from Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from Excel": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Schema": {
+      "main": [
+        [
+          {
+            "node": "Update Schema for Document Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from CSV": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Document Metadata": {
+      "main": [
+        [
+          {
+            "node": "Download File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set File ID": {
+      "main": [
+        [
+          {
+            "node": "Insert Document Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Insert Table EAD",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert Table Inventory",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c4a8adef-d7fe-4bc2-890f-f77d3fed09b3",
+  "meta": {
+    "instanceId": "89f74d3feada356335f2ee4fca43c9ecaea09ca01185c476cbe8d4a4b560dda8"
+  },
+  "id": "1PGtzsAQDQqSeJBs",
+  "tags": []
+}

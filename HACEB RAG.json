@@ -1,0 +1,413 @@
+{
+  "name": "HACEB RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "be06ef2e-3126-4935-8ede-b661b74c9d87",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        112,
+        304
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "hVFfnvMIhcnSYacl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## RAG",
+        "height": 465,
+        "width": 439,
+        "color": 4
+      },
+      "id": "d366b28e-eb43-4d8e-9513-ec8f51ca4e9f",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        944,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## RAG AI Agent",
+        "height": 465,
+        "width": 924
+      },
+      "id": "de6fec32-bfb5-4ea0-b1aa-e60b9ddc0193",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a9a245e-f1a1-4282-bb02-a81ffe629f0f",
+              "name": "chatInput",
+              "value": "={{$json.chatInput ?? ''}}",
+              "type": "string"
+            },
+            {
+              "id": "b80831d8-c653-4203-8706-adedfdb98f77",
+              "name": "sessionId",
+              "value": "={{$json.sessionId ?? 'local-test'}}\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9ad7c0db-a7ea-4b9b-b2d6-2112a23d21f2",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        304,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "public": true,
+        "authentication": "n8nUserAuth",
+        "initialMessages": "Hola, te comunicaste con MILO tu asistente logístico ",
+        "options": {
+          "title": "MILO",
+          "customCss": "/* ===== Paleta Haceb ===== */\n:root{\n  --h-lime:#B7D334;\n  --h-lime-600:#9CB025;\n  --h-ink:#0B0F14;\n  --h-surface:#0F172A;\n  --h-stroke:#1F2937;\n  --h-text:#E5E7EB;\n  --h-muted:#9CA3AF;\n}\n\n/* Fondo y tipografía */\nhtml, body {\n  background: linear-gradient(180deg, #0B0F14 0%, #0B1116 100%) !important;\n  color: var(--h-text) !important;\n  font-family: Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif !important;\n}\n\n/* Contenedor principal del chat (n8n Hosted Chat) */\n.n8n-chat,\n.n8n-chat-container {\n  background: rgba(15,23,42,0.72) !important;     /* var(--h-surface) con transparencia */\n  border: 1px solid var(--h-stroke) !important;\n  border-radius: 16px !important;\n  box-shadow: 0 24px 60px rgba(0,0,0,.45) !important;\n}\n\n/* Header / Título */\n.n8n-chat-header,\n.n8n-header,\nheader {\n  background: #0B0F14 !important;                 /* var(--h-ink) */\n  color: var(--h-text) !important;\n  border-bottom: 1px solid var(--h-stroke) !important;\n}\n\n/* Mensajes: asistente (bot) */\n.n8n-chat-message--assistant .n8n-chat-bubble,\n.n8n-chat-message.assistant .bubble,\n.n8n-bot-bubble {\n  background: #111827 !important;                 /* gris muy oscuro */\n  color: var(--h-text) !important;\n  border: 1px solid var(--h-stroke) !important;\n  border-radius: 14px !important;\n}\n\n/* Mensajes: usuario */\n.n8n-chat-message--user .n8n-chat-bubble,\n.n8n-chat-message.user .bubble,\n.n8n-user-bubble {\n  background: var(--h-lime) !important;\n  color: #0B0F14 !important;\n  border: none !important;\n  border-radius: 14px !important;\n}\n\n/* Área de entrada */\n.n8n-chat-input, \n.n8n-input, \ntextarea {\n  background: var(--h-surface) !important;\n  color: var(--h-text) !important;\n  border: 1px solid var(--h-stroke) !important;\n  border-radius: 12px !important;\n}\n\n/* Botón enviar / botones */\n.n8n-chat-send-button,\n.n8n-button,\nbutton {\n  background: var(--h-lime) !important;\n  color: #0B0F14 !important;\n  border: none !important;\n  border-radius: 12px !important;\n  box-shadow: 0 6px 20px rgba(183,211,52,.35) !important;\n}\n.n8n-chat-send-button:hover,\n.n8n-button:hover,\nbutton:hover {\n  background: var(--h-lime-600) !important;\n}\n\n/* Links */\na { color: var(--h-lime) !important; }\n\n/* Scrollbar (webkit) */\n*::-webkit-scrollbar { width: 10px; height:10px; }\n*::-webkit-scrollbar-thumb {\n  background: #2B3442;\n  border-radius: 10px;\n  border: 2px solid #0B0F14;\n}"
+        }
+      },
+      "id": "f17038fe-1bce-49ea-a33c-272d6f1979a1",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        80
+      ],
+      "webhookId": "e104e40e-6134-4825-a6f0-8a646d882662"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "Rol: Asistente de logística para Contact Center.\n\nCapacidades:\n- Consultar EAD por numero_pedido y cedula\n\n- Actualizar EAD (solo cancelar o reprogramar) con confirmación explícita del usuario y validando numero_pedido + cedula.\n\n- Consultar inventario por nombre de producto:\n\n- Si stock_actual > 0: responde “Disponible — entrega estimada 3 a 5 días.”\n\n- Si stock_actual = 0 y existe próxima llegada (campos de llegada agosto16..agosto31):\n“No disponible hoy; estimado de reposición: {eta_proximo_dias} días (llega {proxima_fecha}, {proxima_cantidad} und.).”\n\n- Si no hay próxima llegada: “No disponible hoy; sin fecha de reposición programada.”\n\n- Usa documents para políticas/procedimientos y dudas generales.\n\nReglas:\n\n- Para modificar EAD pide confirmación explícita:\n\n- “¿Confirmas {cancelar/reprogramar} el pedido {PED-…}?”\n\n- Antes de ejecutar un cambio, repite los datos clave:\n\n- “Voy a actualizar el pedido {PED-…} de la cédula {…} a {nuevo_estado} {con fecha estimada {YYYY-MM-DD}}.”\n\n- Si faltan datos (p. ej., cédula o número), pídelos.\n\n- Estados permitidos (usar exactamente):\n{Pendiente, Entregado, No Entregado, Entrega Parcial, Atraso, Inicio de Ruta, Cancelado, Reprogramado}.\n\n- Si hay ambigüedad de producto, ofrece hasta 3 coincidencias más cercanas con sku, producto y estado (disponible / no disponible + ETA).\n\n- Responde en español, de forma breve y clara."
+        }
+      },
+      "id": "36340667-53ab-4a95-b80a-ea892e27ee28",
+      "name": "RAG AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.6,
+      "position": [
+        512,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to fetch all available documents, including the table schema if the file is a CSV or Excel file.",
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "document_metadata",
+          "mode": "list",
+          "cachedResultName": "document_metadata"
+        },
+        "returnAll": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.5,
+      "position": [
+        416,
+        304
+      ],
+      "id": "aa1f6bf6-98b4-4eca-9d76-e439827cfff3",
+      "name": "List Documents",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "documents",
+        "toolDescription": "Use RAG to look up information in the knowledgebase.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        192
+      ],
+      "id": "ff68eab0-c775-4bf9-83d2-096239450f04",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "1HYE5IEkmwcILav7",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1104,
+        320
+      ],
+      "id": "9d0337ba-ff93-4d37-ba08-688a142373a2",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "hVFfnvMIhcnSYacl",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Devuelve el estado de despacho (EAD) de un pedido. \nParámetros esperados:\n- numero_pedido (string, opcional)\n- cedula (string, opcional)\n\nSi no se envía alguno de los dos, se busca solo por el enviado.",
+        "operation": "executeQuery",
+        "query": "WITH p AS (\n  SELECT\n    NULLIF($1::text, '') AS pedido,\n    NULLIF($2::text, '') AS cedula\n),\n-- Filtra por los parámetros que vengan (uno o ambos)\nfiltered AS (\n  SELECT e.*\n  FROM ead e, p\n  WHERE (p.pedido IS NULL OR e.numero_pedido = p.pedido)\n    AND (p.cedula IS NULL OR e.cedula = p.cedula)\n    AND (p.pedido IS NOT NULL OR p.cedula IS NOT NULL)   -- guard: evita traer todo si ambos vacíos\n),\n-- Orden y ranking para tomar 1 o 5 sin usar LIMIT variable\nranked AS (\n  SELECT\n    f.*,\n    ROW_NUMBER() OVER (\n      ORDER BY\n        COALESCE(f.fecha_estimada_entrega, f.fecha_entrega) DESC NULLS LAST,\n        f.numero_pedido DESC\n    ) AS rn\n  FROM filtered f\n)\nSELECT\n  r.numero_pedido,\n  r.numero_transporte,\n  r.cedula,                          -- <-- calificado\n  r.estado_pedido,\n  r.fecha_entrega,\n  r.fecha_estimada_entrega\nFROM ranked r\nCROSS JOIN p\nWHERE r.rn <= CASE\n                WHEN p.pedido IS NULL AND p.cedula IS NOT NULL THEN 5\n                ELSE 1\n              END;\n",
+        "options": {
+          "queryReplacement": "={{ $fromAI('numero_pedido') }}, {{ $fromAI('cedula') }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        544,
+        304
+      ],
+      "id": "2ef206c2-4714-4e54-ac1a-597ef21998c8",
+      "name": "EAD LookUp",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Cambia el estado de despacho de un pedido.\nParámetros:\n- numero_pedido (string, requerido)\n- cedula (string, requerido)\n- nuevo_estado (string, requerido) \n  Valores permitidos: Reprogramado, Cancelado, Incidencia.\nDebe usarse solo tras confirmar con el usuario.\n",
+        "operation": "executeQuery",
+        "query": "UPDATE ead\nSET\n  estado_pedido = $3,\n  fecha_estimada_entrega = CASE\n    WHEN $3 = 'Reprogramado' THEN NULLIF($4::timestamp, NULL)\n    WHEN $3 = 'Cancelado'    THEN NULL\n    ELSE fecha_estimada_entrega\n  END\nWHERE numero_pedido = $1\n  AND cedula = $2\nRETURNING\n  numero_pedido, numero_transporte, cedula,\n  estado_pedido, fecha_entrega, fecha_estimada_entrega;",
+        "options": {
+          "queryReplacement": "={{ [ $fromAI('numero_pedido'),$fromAI('cedula'), $fromAI('nuevo_estado'), $fromAI('nueva_fecha_estimada') ] }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        656,
+        304
+      ],
+      "id": "f3467e46-1272-4921-baf2-2e0ec7de7854",
+      "name": "EAD Update",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Consulta inventario por coincidencia de nombre de producto.\nParámetros:\n- producto (string, requerido; coincidencia parcial)\nReglas para la respuesta del agente:\n- stock_actual > 0 → Disponible. Entrega estimada 3–5 días.\n- stock_actual = 0 y stock_proximo > 0 → No disponible hoy; reposición según eta_proximo_dias.\n- en otro caso → No disponible sin fecha; sugerir alternativas.\n",
+        "operation": "executeQuery",
+        "query": "SELECT\n  i.sku,\n  i.producto,\n  i.categoria,\n  i.stock_actual,\n\n  -- Próxima llegada (fecha y cantidad), tomada del primer día futuro con qty > 0\n  x.next_date,\n  x.next_qty,\n  CASE\n    WHEN x.next_date IS NULL THEN NULL\n    ELSE (x.next_date - (CURRENT_DATE AT TIME ZONE 'America/Bogota')::date)\n  END AS dias_para_reposicion,\n\n  -- Mensaje listo para usar (opcional; también puedes dejar que el agente lo arme)\n  CASE\n    WHEN i.stock_actual > 0 THEN 'Disponible — entrega estimada 3 a 5 días'\n    WHEN x.next_date IS NOT NULL THEN\n      'No disponible hoy; estimado de reposición: '||\n      to_char(x.next_date, 'DD \"de\" Mon')||' ('||x.next_qty||' uds)'\n    ELSE\n      'No disponible hoy; sin fecha de reposición programada.'\n  END AS disponibilidad\nFROM inventory i\nLEFT JOIN LATERAL (\n  SELECT d::date AS next_date, q::int AS next_qty\n  FROM unnest(\n         ARRAY['2025-08-16'::date,'2025-08-17','2025-08-18','2025-08-19',\n               '2025-08-20','2025-08-21','2025-08-22','2025-08-23',\n               '2025-08-24','2025-08-25','2025-08-26','2025-08-27',\n               '2025-08-28','2025-08-29','2025-08-30','2025-08-31'],\n         ARRAY[i.agosto16, i.agosto17, i.agosto18, i.agosto19,\n               i.agosto20, i.agosto21, i.agosto22, i.agosto23,\n               i.agosto24, i.agosto25, i.agosto26, i.agosto27,\n               i.agosto28, i.agosto29, i.agosto30, i.agosto31]\n       ) AS t(d,q)\n  WHERE q > 0\n    AND d >= (CURRENT_DATE AT TIME ZONE 'America/Bogota')::date\n  ORDER BY d\n  LIMIT 1\n) AS x ON TRUE\nWHERE (i.sku ILIKE '%' || $1 || '%')\n   OR (i.producto ILIKE '%' || $1 || '%')\nORDER BY (i.sku ILIKE '%' || $1 || '%') DESC, i.stock_actual DESC\nLIMIT 5;",
+        "options": {
+          "queryReplacement": "={{ $fromAI('producto') }}"
+        }
+      },
+      "type": "n8n-nodes-base.postgresTool",
+      "typeVersion": 2.6,
+      "position": [
+        784,
+        304
+      ],
+      "id": "6fe76bdb-4104-4c79-a560-75a336eb8071",
+      "name": "Inventory LookUp",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        272,
+        304
+      ],
+      "id": "5f1bea94-4e03-48fe-9b20-b5ebddb5cb25",
+      "name": "Simple Memory"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Documents": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EAD LookUp": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EAD Update": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Inventory LookUp": {
+      "ai_tool": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "RAG AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "422a0370-6b1a-4463-b9f5-15cee2c97446",
+  "meta": {
+    "instanceId": "89f74d3feada356335f2ee4fca43c9ecaea09ca01185c476cbe8d4a4b560dda8"
+  },
+  "id": "ehX0wNdRClA9JJfi",
+  "tags": []
+}

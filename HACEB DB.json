@@ -1,0 +1,44 @@
+{
+  "name": "HACEB DB",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Estados permitidos como CHECK (puedes usar ENUM si prefieres)\nCREATE TABLE IF NOT EXISTS ead (\n  numero_pedido TEXT PRIMARY KEY,\n  numero_transporte INTEGER NOT NULL,\n  cedula TEXT NOT NULL,\n  estado_pedido TEXT NOT NULL CHECK (estado_pedido IN (\n    'Pendiente', 'Entregado', 'No Entregado', 'Entrega Parcial', 'Atraso', 'Inicio de Ruta', 'Cancelado', 'Reprogramado'\n  )),\n  fecha_entrega TIMESTAMP NULL,\n  fecha_estimada_entrega TIMESTAMP NULL\n);\n\nCREATE TABLE IF NOT EXISTS inventory (\n  sku TEXT PRIMARY KEY,\n  categoria TEXT NOT NULL,\n  producto TEXT NOT NULL,\n  agosto16 INT DEFAULT 0,\n  agosto17 INT DEFAULT 0,\n  agosto18 INT DEFAULT 0,\n  agosto19 INT DEFAULT 0,\n  agosto20 INT DEFAULT 0,\n  agosto21 INT DEFAULT 0,\n  agosto22 INT DEFAULT 0,\n  agosto23 INT DEFAULT 0,\n  agosto24 INT DEFAULT 0,\n  agosto25 INT DEFAULT 0,\n  agosto26 INT DEFAULT 0,\n  agosto27 INT DEFAULT 0,\n  agosto28 INT DEFAULT 0,\n  agosto29 INT DEFAULT 0,\n  agosto30 INT DEFAULT 0,\n  agosto31 INT DEFAULT 0,\n  stock_actual INT NOT NULL DEFAULT 0\n);\n\n-- EAD\nCREATE INDEX IF NOT EXISTS idx_ead_cedula        ON ead(cedula);\nCREATE INDEX IF NOT EXISTS idx_ead_estado        ON ead(estado_pedido);\nCREATE INDEX IF NOT EXISTS idx_ead_eta           ON ead(fecha_estimada_entrega);\nCREATE INDEX IF NOT EXISTS idx_ead_entrega       ON ead(fecha_entrega);\nCREATE INDEX IF NOT EXISTS idx_ead_transporte    ON ead(numero_transporte);\n\n-- INVENTORY\nCREATE INDEX IF NOT EXISTS idx_inventory_categoria ON inventory(categoria);\nCREATE INDEX IF NOT EXISTS idx_inventory_producto  ON inventory(producto);\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        128,
+        80
+      ],
+      "id": "3a87027a-7e25-4c4f-a605-d43cd21e4a05",
+      "name": "Create EAD/Inventario",
+      "credentials": {
+        "postgres": {
+          "id": "f66mcgdyIkAH0hzt",
+          "name": "Postgres account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Create EAD/Inventario": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ceb63626-72b8-422b-80fb-a1d5157f3266",
+  "meta": {
+    "instanceId": "89f74d3feada356335f2ee4fca43c9ecaea09ca01185c476cbe8d4a4b560dda8"
+  },
+  "id": "h0FNTzs3qKOJ7rbf",
+  "tags": []
+}
