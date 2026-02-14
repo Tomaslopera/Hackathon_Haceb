@@ -2,6 +2,12 @@
 
 Asistente conversacional para Contact Center que consulta y actualiza estado de pedidos (EAD) y verifica inventario con PostgreSQL; además usa RAG para políticas/procedimientos mediante Supabase Vector + OpenAI. Todo orquestado en n8n.
 
+## WorkFlow
+
+![Pipeline](images/PIPELINE.png)
+
+![RAG](images/RAG.png)
+
 ## ¿Qué hace?
 
 - Chat web (widget de n8n) llamado MILO con reglas de negocio logísticas.
